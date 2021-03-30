@@ -1,26 +1,43 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { Component } from 'react';
 import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      imgList: [],
+      loading: false,
+    }
+    this.fetchAPI = this.fetchAPI.bind(this);
+  }
+
+  fetchAPI() {
+    const api = 'https://dog.ceo/api/breeds/image/random';
+    this.setState({ loading: true }, () => {
+      fetch(api)
+        .then(response => response.json())
+        .then(({ message }) => {
+          this.setState((previousState) => ({
+            loading: false,
+            imgList: [...previousState.imgList, message],
+          }))
+        });
+    });
+  }
+  
+  componentDidMount() {
+    this.fetchAPI();
+  }
+
+  render() {
+    const { loading, imgList } = this.state;
+    return (
+      <div className="App">
+        <button type="button" onClick={ this.fetchAPI }>New Pic</button>
+        {loading ? <p>Loading...</p> : imgList.map((img) => <img src={ img } key={ img } alt="dog-pic" />)}
+      </div>
+    );
+  }
 }
 
 export default App;
